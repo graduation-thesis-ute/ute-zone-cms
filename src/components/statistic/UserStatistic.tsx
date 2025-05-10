@@ -244,7 +244,7 @@ const UserStatistic = () => {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {rolesData.map((entry: any, index: any) => (
+                  {rolesData.map((index: any) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index]} />
                   ))}
                 </Pie>

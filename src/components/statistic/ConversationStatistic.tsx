@@ -11,7 +11,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
-import { MessageCircle, Users, Heart, BookOpen, Eye, Zap } from "lucide-react";
+import { MessageCircle, Users, Heart, BookOpen, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { LoadingDialog } from "../Dialog";
@@ -177,7 +177,7 @@ const ConversationStatistic = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieChartData.map((entry, index) => (
+                  {pieChartData.map((index: any) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
