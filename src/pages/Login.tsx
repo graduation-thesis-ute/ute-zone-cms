@@ -6,6 +6,8 @@ import { ToastContainer, toast } from "react-toastify";
 import Button from "../components/Button";
 import { LoadingDialog } from "../components/Dialog";
 import useFetch from "../hooks/useFetch";
+import UTELogo from "../assets/ute_logo_hcmute.png";
+import LoginPageLogo from "../assets/login-page.png";
 
 const Login = () => {
   const { post, loading } = useFetch();
@@ -42,32 +44,62 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-        <h2 className="text-2xl font-bold text-center mb-6">Đăng nhập</h2>
-        <InputField
-          title="Tài khoản đăng nhập"
-          isRequire={true}
-          placeholder="Nhập email, SĐT hoặc MSSV"
-          onChangeText={(value: any) => handleChange("username", value)}
-          value={form.username}
-          icon={UserCircleIcon}
-          error={errors.username}
-        />
-        <InputField
-          title="Mật khẩu"
-          isRequire={true}
-          placeholder="Nhập mật khẩu"
-          onChangeText={(value: any) => handleChange("password", value)}
-          value={form.password}
-          icon={LockIcon}
-          secureTextEntry={!showPassword}
-          togglePassword={() => setShowPassword(!showPassword)}
-          showPassword={showPassword}
-          error={errors.password}
-        />
-        <Button title="ĐĂNG NHẬP" color="royalblue" onPress={handleSubmit} />
+    <div className="min-h-screen flex bg-blue-500">
+      {/* Bên trái */}
+      <div className="w-1/3 flex items-center justify-center p-8">
+        <div className="text-white text-center">
+          <img
+            src={UTELogo}
+            alt="UTE Zone logo"
+            className="w-full md:w-1/4 lg:w-1/6 mb-4 mx-auto"
+          />
+          <h1 className="text-4xl font-bold mb-4">UTE Zone</h1>
+          <img
+            src={LoginPageLogo}
+            alt="Illustration"
+            className="mb-4 mx-auto"
+          />
+        </div>
       </div>
+
+      {/* Bên phải */}
+      <div className="w-2/3 bg-white flex items-center justify-center p-8 rounded-s-3xl">
+        <div className="w-full max-w-xl">
+          <h2 className="text-3xl font-bold text-center mb-2">Đăng nhập</h2>
+          <p className="text-center text-gray-500 mb-6">
+            Trang quản trị hệ thống UTE
+          </p>
+          <div className="space-y-5">
+            <InputField
+              title="Tài khoản đăng nhập"
+              isRequire={true}
+              placeholder="Nhập email, SĐT hoặc MSSV"
+              onChangeText={(value: any) => handleChange("username", value)}
+              value={form.username}
+              icon={UserCircleIcon}
+              error={errors.username}
+            />
+            <InputField
+              title="Mật khẩu"
+              isRequire={true}
+              placeholder="Nhập mật khẩu"
+              onChangeText={(value: any) => handleChange("password", value)}
+              value={form.password}
+              icon={LockIcon}
+              secureTextEntry={!showPassword}
+              togglePassword={() => setShowPassword(!showPassword)}
+              showPassword={showPassword}
+              error={errors.password}
+            />
+            <Button
+              title="ĐĂNG NHẬP"
+              color="royalblue"
+              onPress={handleSubmit}
+            />
+          </div>
+        </div>
+      </div>
+
       <LoadingDialog isVisible={loading} />
       <ToastContainer />
     </div>
