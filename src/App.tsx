@@ -9,6 +9,7 @@ import Post from "./pages/Post";
 import Role from "./pages/Role";
 import Statistic from "./pages/Statistic";
 import Setting from "./pages/Setting";
+import Document from "./pages/Document";
 import { useGlobalContext } from "./types/context";
 
 const App = () => {
@@ -50,6 +51,7 @@ const App = () => {
                   <Route path="/statistic" element={<Statistic />} />
                   <Route path="/setting" element={<Setting />} />
                   <Route path="/role" element={<Role />} />
+                  <Route path="/document" element={<Document />} />
                 </>
               ) : (
                 <>

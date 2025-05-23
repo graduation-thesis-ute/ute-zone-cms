@@ -77,6 +77,12 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
       path: "/post",
     },
     {
+      name: "document",
+      label: "Quản lý tài liệu",
+      icon: <FileTextIcon size={20} />,
+      path: "/document",
+    },
+    {
       name: "role",
       label: "Quản lý quyền",
       icon: <ShieldEllipsisIcon size={20} />,
