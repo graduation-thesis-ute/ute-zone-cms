@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Table from "../components/Table";
-import { LoadingDialog } from "../components/Dialog";
+import { LoadingDialog, ConfimationDialog } from "../components/Dialog";
 import useFetch from "../hooks/useFetch";
 import Header from "../components/Header";
 import InputBox from "../components/InputBox";
@@ -13,12 +13,15 @@ const Document = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const itemsPerPage = 10;
 
   const columns = [
     { label: "Tên tài liệu", accessor: "name", align: "left" },
     {
-      label: "Loại tài liệu",
+      label: "File name",
       accessor: "type",
       align: "center",
       render: (item: any) => (
@@ -42,7 +45,7 @@ const Document = () => {
       align: "center",
     },
     {
-      label: "Thao tác",
+      label: "Hành động",
       accessor: "actions",
       align: "center",
       render: (item: any) => (
@@ -98,14 +101,24 @@ const Document = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa tài liệu này?")) {
-      await del(`/v1/chatbot/documents/${id}`);
+    setDocumentToDelete(id);
+    setDeleteDialogVisible(true);
+  };
+
+  const confirmDelete = async () => {
+    setDeleteDialogVisible(false);
+    setDocumentToDelete(null);
+
+    if (documentToDelete) {
+      await del(`/v1/chatbot/documents/${documentToDelete}`);
       await handleRefreshData();
     }
   };
 
   const handleUpload = async (file: File, title: string) => {
+    setUploadModalVisible(false);
     try {
+      setIsUploading(true);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("title", title);
@@ -115,10 +128,11 @@ const Document = () => {
         throw new Error(res.error);
       }
 
-      setUploadModalVisible(false);
       await handleRefreshData();
     } catch (error: any) {
       alert(error.message || "Có lỗi xảy ra khi tải lên tài liệu");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -159,6 +173,23 @@ const Document = () => {
         }
       />
       <LoadingDialog isVisible={loading} />
+      <LoadingDialog
+        isVisible={isUploading}
+        title="Đang tải lên"
+        message="Vui lòng chờ trong giây lát..."
+      />
+      <ConfimationDialog
+        isVisible={deleteDialogVisible}
+        title="Xác nhận xóa"
+        message="Bạn có chắc chắn muốn xóa tài liệu này?"
+        color="red"
+        confirmText="Xóa"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setDeleteDialogVisible(false);
+          setDocumentToDelete(null);
+        }}
+      />
       <UploadDocumentDialog
         isVisible={uploadModalVisible}
         setVisible={setUploadModalVisible}
