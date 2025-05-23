@@ -153,9 +153,7 @@ const UploadDocumentDialog = ({
                 <p className="text-gray-600">
                   Kéo và thả tài liệu vào đây hoặc click để chọn tài liệu
                 </p>
-                <p className="text-sm text-gray-500">
-                  Hỗ trợ: PDF, DOC, DOCX, TXT
-                </p>
+                <p className="text-sm text-gray-500">Hỗ trợ: PDF file</p>
               </div>
             )}
           </div>
