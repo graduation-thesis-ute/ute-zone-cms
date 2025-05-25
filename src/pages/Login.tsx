@@ -67,7 +67,7 @@ const Login = () => {
         <div className="w-full max-w-xl">
           <h2 className="text-3xl font-bold text-center mb-2">Đăng nhập</h2>
           <p className="text-center text-gray-500 mb-6">
-            Trang quản trị hệ thống UTE
+            Trang quản trị hệ thống UTEZONE
           </p>
           <div className="space-y-5">
             <InputField

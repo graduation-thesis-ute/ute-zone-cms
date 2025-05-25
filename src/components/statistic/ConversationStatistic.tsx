@@ -177,7 +177,7 @@ const ConversationStatistic = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieChartData.map((index: any) => (
+                  {pieChartData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}

@@ -12,6 +12,7 @@ import Setting from "./pages/Setting";
 import Document from "./pages/Document";
 import { useGlobalContext } from "./types/context";
 import ChatbotSuggestion from "./pages/ChatbotSuggestion";
+import ChatbotDashboard from "./pages/ChatbotDashboard";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +55,10 @@ const App = () => {
                   <Route path="/role" element={<Role />} />
                   <Route path="/document" element={<Document />} />
                   <Route path="/suggestion" element={<ChatbotSuggestion />} />
+                  <Route
+                    path="/chatbot-dashboard"
+                    element={<ChatbotDashboard />}
+                  />
                 </>
               ) : (
                 <>
