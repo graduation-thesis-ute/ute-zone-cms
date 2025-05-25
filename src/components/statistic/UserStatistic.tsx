@@ -244,9 +244,14 @@ const UserStatistic = () => {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {rolesData.map((index: any) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                  ))}
+                  {rolesData.map(
+                    (entry: { name: string; value: number }, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    )
+                  )}
                 </Pie>
                 <Tooltip />
                 <Legend />
