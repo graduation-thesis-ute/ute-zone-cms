@@ -11,7 +11,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
-import { MessageCircle, Users, Heart, BookOpen, Eye, Zap } from "lucide-react";
+import { MessageCircle, Users, Heart, BookOpen, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { LoadingDialog } from "../Dialog";

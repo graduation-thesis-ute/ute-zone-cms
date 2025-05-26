@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./views/Login";
-import Loading from "./views/Loading";
+import Login from "./pages/Login";
+import Loading from "./pages/Loading";
 import useFetch from "./hooks/useFetch";
-import NotFound from "./views/NotFound";
-import User from "./views/User";
-import Post from "./views/Post";
-import Role from "./views/Role";
-import Statistic from "./views/Statistic";
-import Setting from "./views/Setting";
+import NotFound from "./pages/NotFound";
+import User from "./pages/User";
+import Post from "./pages/Post";
+import Role from "./pages/Role";
+import Statistic from "./pages/Statistic";
+import Setting from "./pages/Setting";
+import Document from "./pages/Document";
 import { useGlobalContext } from "./types/context";
+import ChatbotSuggestion from "./pages/ChatbotSuggestion";
+import ChatbotDashboard from "./pages/ChatbotDashboard";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,6 +53,12 @@ const App = () => {
                   <Route path="/statistic" element={<Statistic />} />
                   <Route path="/setting" element={<Setting />} />
                   <Route path="/role" element={<Role />} />
+                  <Route path="/document" element={<Document />} />
+                  <Route path="/suggestion" element={<ChatbotSuggestion />} />
+                  <Route
+                    path="/chatbot-dashboard"
+                    element={<ChatbotDashboard />}
+                  />
                 </>
               ) : (
                 <>

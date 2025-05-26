@@ -77,6 +77,24 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
       path: "/post",
     },
     {
+      name: "document",
+      label: "Quản lý tài liệu",
+      icon: <FileTextIcon size={20} />,
+      path: "/document",
+    },
+    {
+      name: "suggestion",
+      label: "Quản lý câu hỏi gợi ý",
+      icon: <FileTextIcon size={20} />,
+      path: "/suggestion",
+    },
+    {
+      name: "chatbot-dashboard",
+      label: "Dashboard Chatbot",
+      icon: <ChartPieIcon size={20} />,
+      path: "/chatbot-dashboard",
+    },
+    {
       name: "role",
       label: "Quản lý quyền",
       icon: <ShieldEllipsisIcon size={20} />,

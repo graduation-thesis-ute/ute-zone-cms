@@ -6,7 +6,6 @@ import {
   XIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ThumbsUpIcon,
   MessageSquareIcon,
   PencilIcon,
   HeartIcon,

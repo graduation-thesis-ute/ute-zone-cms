@@ -30,7 +30,7 @@ import { useGlobalContext } from "../types/context";
 
 const Post = () => {
   const { profile } = useGlobalContext();
-  const { isDialogVisible, showDialog, hideDialog } = useDialog();
+  const { isDialogVisible, hideDialog } = useDialog();
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
@@ -234,10 +234,10 @@ const Post = () => {
     }
   };
 
-  const handleDeleteDialog = (id: any) => {
-    setPostId(id);
-    showDialog();
-  };
+  // const handleDeleteDialog = (id: any) => {
+  //   setPostId(id);
+  //   showDialog();
+  // };
 
   const handleRefreshData = async () => {
     setCurrentPage(0);
@@ -344,7 +344,7 @@ const Post = () => {
                     setPostId(id);
                     setReviewModalVisible(true);
                   }}
-                  disableEditCondition={(item: any) => true}
+                  disableEditCondition={() => true}
                   disableDeleteCondition={(item: any) =>
                     item.status !== 1 || item.kind === 3
                   }
