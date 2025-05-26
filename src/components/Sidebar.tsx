@@ -77,6 +77,18 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
       path: "/post",
     },
     {
+      name: "page",
+      label: "Quản lý trang",
+      icon: <FileTextIcon size={20} />,
+      path: "/page",
+    },
+    {
+      name: "group",
+      label: "Quản lý nhóm",
+      icon: <FileTextIcon size={20} />,
+      path: "/group",
+    },
+    {
       name: "document",
       label: "Quản lý tài liệu",
       icon: <FileTextIcon size={20} />,
