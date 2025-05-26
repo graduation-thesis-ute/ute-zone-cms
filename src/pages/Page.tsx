@@ -286,7 +286,7 @@ const Page = () => {
     try {
       const res = await get("/v1/moderation-settings/list", { kind: 2 });
       if (res.result) {
-        console.log("Moderation settings:", res.data);
+        console.log("Fetched moderation settings:", res.data);
         setModerationSettings(res.data);
       }
     } catch (error) {
@@ -338,6 +338,7 @@ const Page = () => {
   };
 
   const handleRefreshData = async () => {
+    console.log("Refreshing data...");
     setCurrentPage(0);
     await Promise.all([getData(), fetchModerationSettings()]);
   };
@@ -355,6 +356,7 @@ const Page = () => {
 
   const getPageModerationStatus = (pageId: string): boolean => {
     const setting = moderationSettings.find(s => s.entityId === pageId);
+    console.log("Getting moderation status for page:", { pageId, setting });
     return setting?.isAutoModerationEnabled || false;
   };
 
@@ -365,11 +367,15 @@ const Page = () => {
         if (!page) return;
         
         const currentStatus = getPageModerationStatus(pageId);
+        console.log("Toggle single page:", { pageId, currentStatus });
+        
         const res = await put(`/v1/moderation-settings/page`, {
           isAutoModerationEnabled: !currentStatus,
           isModerationRequired: true,
           pageId: pageId
         });
+        console.log("Single page toggle response:", res);
+        
         if (res.result) {
           toast.success(res.message);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
@@ -377,20 +383,41 @@ const Page = () => {
           toast.error(res.message);
         }
       } else {
-        const res = await put(`/v1/moderation-settings/pages`, {
-          pageIds: selectedPages,
-          isAutoModerationEnabled: !isGlobalAutoModerationEnabled,
-          isModerationRequired: true
-        });
-        if (res.result) {
-          toast.success(res.message);
+        // Kiểm tra trạng thái hiện tại của các trang được chọn
+        const selectedPagesStatus = selectedPages.map(pageId => ({
+          pageId,
+          status: getPageModerationStatus(pageId)
+        }));
+        console.log("Selected pages status:", selectedPagesStatus);
+        
+        const allEnabled = selectedPagesStatus.every(item => item.status === true);
+        console.log("All enabled:", allEnabled);
+        
+        // Cập nhật từng trang một
+        const results = await Promise.all(
+          selectedPages.map(async (pageId) => {
+            const res = await put(`/v1/moderation-settings/page`, {
+              isAutoModerationEnabled: !allEnabled,
+              isModerationRequired: true,
+              pageId: pageId
+            });
+            return { pageId, success: res.result };
+          })
+        );
+        
+        console.log("Multiple pages update results:", results);
+        
+        const allSuccess = results.every(r => r.success);
+        if (allSuccess) {
+          toast.success("Đã cập nhật cài đặt duyệt tự động cho tất cả các trang đã chọn");
           setSelectedPages([]);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
         } else {
-          toast.error(res.message);
+          toast.error("Có một số trang không thể cập nhật cài đặt duyệt tự động");
         }
       }
     } catch (error) {
+      console.error("Error in handleToggleAutoModeration:", error);
       toast.error("Có lỗi xảy ra khi cập nhật cài đặt duyệt tự động");
     }
   };
@@ -414,6 +441,27 @@ const Page = () => {
   const handleExtraButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     handleToggleAutoModeration();
+  };
+
+  const renderMultiSelectButton = () => {
+    if (selectedPages.length === 0) return null;
+    
+    const selectedPagesStatus = selectedPages.map(pageId => getPageModerationStatus(pageId));
+    const allEnabled = selectedPagesStatus.every(status => status === true);
+    
+    return (
+      <button
+        onClick={handleExtraButtonClick}
+        className={`p-2 rounded-lg transition-colors ${
+          allEnabled
+            ? "bg-green-100 text-green-800 hover:bg-green-200"
+            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+        }`}
+        title={allEnabled ? "Tắt duyệt tự động cho các trang đã chọn" : "Bật duyệt tự động cho các trang đã chọn"}
+      >
+        <ShieldCheckIcon size={20} />
+      </button>
+    );
   };
 
   return (
@@ -508,23 +556,7 @@ const Page = () => {
                       )}
                       <span>Chọn tất cả</span>
                     </button>
-                    {selectedPages.length > 0 && (
-                      <button
-                        onClick={handleExtraButtonClick}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isGlobalAutoModerationEnabled
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                      >
-                        <ShieldCheckIcon size={20} />
-                        <span>
-                          {isGlobalAutoModerationEnabled
-                            ? "Tắt duyệt tự động cho các trang đã chọn"
-                            : "Bật duyệt tự động cho các trang đã chọn"}
-                        </span>
-                      </button>
-                    )}
+                    {selectedPages.length > 0 && renderMultiSelectButton()}
                   </div>
                 </div>
               </>

@@ -366,11 +366,15 @@ const Group = () => {
         if (!group) return;
         
         const currentStatus = getGroupModerationStatus(groupId);
+        console.log("Toggle single group:", { groupId, currentStatus });
+        
         const res = await put(`/v1/moderation-settings/group/${groupId}`, {
           isAutoModerationEnabled: !currentStatus,
           isModerationRequired: true,
           groupId: groupId
         });
+        console.log("Single group toggle response:", res);
+        
         if (res.result) {
           toast.success(res.message);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
@@ -378,20 +382,41 @@ const Group = () => {
           toast.error(res.message);
         }
       } else {
-        const res = await put(`/v1/moderation-settings/groups`, {
-          groupIds: selectedGroups,
-          isAutoModerationEnabled: !isGlobalAutoModerationEnabled,
-          isModerationRequired: true
-        });
-        if (res.result) {
-          toast.success(res.message);
+        // Kiểm tra trạng thái hiện tại của các nhóm được chọn
+        const selectedGroupsStatus = selectedGroups.map(groupId => ({
+          groupId,
+          status: getGroupModerationStatus(groupId)
+        }));
+        console.log("Selected groups status:", selectedGroupsStatus);
+        
+        const allEnabled = selectedGroupsStatus.every(item => item.status === true);
+        console.log("All enabled:", allEnabled);
+        
+        // Cập nhật từng nhóm một
+        const results = await Promise.all(
+          selectedGroups.map(async (groupId) => {
+            const res = await put(`/v1/moderation-settings/group/${groupId}`, {
+              isAutoModerationEnabled: !allEnabled,
+              isModerationRequired: true,
+              groupId: groupId
+            });
+            return { groupId, success: res.result };
+          })
+        );
+        
+        console.log("Multiple groups update results:", results);
+        
+        const allSuccess = results.every(r => r.success);
+        if (allSuccess) {
+          toast.success("Đã cập nhật cài đặt duyệt tự động cho tất cả các nhóm đã chọn");
           setSelectedGroups([]);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
         } else {
-          toast.error(res.message);
+          toast.error("Có một số nhóm không thể cập nhật cài đặt duyệt tự động");
         }
       }
     } catch (error) {
+      console.error("Error in handleToggleAutoModeration:", error);
       toast.error("Có lỗi xảy ra khi cập nhật cài đặt duyệt tự động");
     }
   };
@@ -412,6 +437,27 @@ const Group = () => {
   const getGroupModerationStatus = (groupId: string): boolean => {
     const setting = moderationSettings.find(s => s.entityId === groupId);
     return setting?.isAutoModerationEnabled || false;
+  };
+
+  const renderMultiSelectButton = () => {
+    if (selectedGroups.length === 0) return null;
+    
+    const selectedGroupsStatus = selectedGroups.map(groupId => getGroupModerationStatus(groupId));
+    const allEnabled = selectedGroupsStatus.every(status => status === true);
+    
+    return (
+      <button
+        onClick={handleExtraButtonClick}
+        className={`p-2 rounded-lg transition-colors ${
+          allEnabled
+            ? "bg-green-100 text-green-800 hover:bg-green-200"
+            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+        }`}
+        title={allEnabled ? "Tắt duyệt tự động cho các nhóm đã chọn" : "Bật duyệt tự động cho các nhóm đã chọn"}
+      >
+        <ShieldCheckIcon size={20} />
+      </button>
+    );
   };
 
   return (
@@ -506,23 +552,7 @@ const Group = () => {
                       )}
                       <span>Chọn tất cả</span>
                     </button>
-                    {selectedGroups.length > 0 && (
-                      <button
-                        onClick={handleExtraButtonClick}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isGlobalAutoModerationEnabled
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                      >
-                        <ShieldCheckIcon size={20} />
-                        <span>
-                          {isGlobalAutoModerationEnabled
-                            ? "Tắt duyệt tự động cho các nhóm đã chọn"
-                            : "Bật duyệt tự động cho các nhóm đã chọn"}
-                        </span>
-                      </button>
-                    )}
+                    {selectedGroups.length > 0 && renderMultiSelectButton()}
                   </div>
                 </div>
               </>
