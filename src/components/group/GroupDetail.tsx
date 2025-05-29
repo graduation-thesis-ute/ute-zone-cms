@@ -81,16 +81,24 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const res = await get(`/v1/group-member/members/${groupId}`, {
+        console.log("Fetching members for group:", groupId);
+        const res = await get(`/v1/group-member/list`, {
+          groupId,
           page: currentMemberPage,
           size: itemsPerPage
         });
+        console.log("Members API response:", res);
         if (res.result) {
           setMembers(res.data.content);
           setTotalMemberPages(res.data.totalPages);
           setTotalMembers(res.data.totalElements);
+          console.log("Updated total members:", res.data.totalElements);
+        } else {
+          console.error("Failed to fetch members:", res.message);
+          toast.error(res.message);
         }
       } catch (error) {
+        console.error("Error fetching members:", error);
         toast.error("Có lỗi xảy ra khi tải danh sách thành viên");
       }
     };
@@ -308,7 +316,10 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
               <UsersIcon className="text-emerald-500" size={20} />
               <span className="text-gray-600">Thành viên</span>
             </div>
-            <span className="text-xl font-semibold">{totalMembers}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-semibold">{totalMembers}</span>
+              <span className="text-sm text-gray-500">({members.length} trong trang)</span>
+            </div>
           </div>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
