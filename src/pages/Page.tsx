@@ -560,7 +560,7 @@ const Page = () => {
                   </div>
                 </div>
               </>
-            ) : (
+            ) : selectedPageId ? (
               <PageDetail
                 pageId={selectedPageId}
                 onBack={() => {
@@ -568,7 +568,7 @@ const Page = () => {
                   setSelectedPageId(null);
                 }}
               />
-            )}
+            ) : null}
           </>
         }
       />
