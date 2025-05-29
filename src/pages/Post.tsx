@@ -22,6 +22,7 @@ import {
   LockIcon,
   MessageSquareIcon,
   UsersIcon,
+  ShieldCheckIcon,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import PostReview from "../components/post/PostReview";
@@ -40,6 +41,7 @@ const Post = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [view, setView] = useState("list");
+  const [isAutoModerationEnabled, setIsAutoModerationEnabled] = useState(false);
   const itemsPerPage = 8;
 
   const columns = [
@@ -176,7 +178,7 @@ const Post = () => {
     },
   ];
 
-  const { get, del, loading } = useFetch();
+  const { get, post, put,del, loading } = useFetch();
   const [searchValues, setSearchValues] = useState({
     content: "",
     user: "",
@@ -234,11 +236,6 @@ const Post = () => {
     }
   };
 
-  // const handleDeleteDialog = (id: any) => {
-  //   setPostId(id);
-  //   showDialog();
-  // };
-
   const handleRefreshData = async () => {
     setCurrentPage(0);
     await getData();
@@ -255,6 +252,42 @@ const Post = () => {
     setData(res.data.content);
     setTotalPages(res.data.totalPages);
   };
+
+  // Thêm hàm để lấy và cập nhật cài đặt duyệt nội dung
+  const fetchModerationSetting = async () => {
+    try {
+      const res = await get("/v1/moderation-settings/global");
+      console.log("Moderation setting response:", res);
+      if (res.result) {
+        setIsAutoModerationEnabled(res.data.isAutoModerationEnabled);
+      }
+    } catch (error) {
+      console.error("Error fetching moderation setting:", error);
+    }
+  };
+
+  const toggleAutoModeration = async () => {
+    try {
+      const res = await put("/v1/moderation-settings/global", {
+        isAutoModerationEnabled: !isAutoModerationEnabled,
+        isModerationRequired: true
+      });
+      console.log("Update moderation setting response:", res);
+      if (res.result) {
+        setIsAutoModerationEnabled(!isAutoModerationEnabled);
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    } catch (error) {
+      console.error("Error updating moderation setting:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật cài đặt");
+    }
+  };
+
+  useEffect(() => {
+    fetchModerationSetting();
+  }, []);
 
   return (
     <>
@@ -274,6 +307,22 @@ const Post = () => {
                   createDisabled={true}
                   onSearch={handleRefreshData}
                   onClear={handleClear}
+                  extraButtons={
+                    <button
+                      onClick={toggleAutoModeration}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-md ${
+                        isAutoModerationEnabled
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      }`}
+                      title={isAutoModerationEnabled ? "Tắt duyệt tự động" : "Bật duyệt tự động"}
+                    >
+                      <ShieldCheckIcon size={20} />
+                      <span>
+                        {isAutoModerationEnabled ? "Đang bật duyệt tự động" : "Đang tắt duyệt tự động"}
+                      </span>
+                    </button>
+                  }
                   SearchBoxes={
                     <>
                       <InputBox
