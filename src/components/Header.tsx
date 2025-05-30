@@ -6,6 +6,7 @@ const Header = ({
   onCreate,
   onClear,
   createDisabled = false,
+  extraButtons,
 }: any) => (
   <div className="flex items-center justify-between mb-4">
     <div className="flex items-center">
@@ -29,14 +30,17 @@ const Header = ({
         </button>
       )}
     </div>
-    {!createDisabled && (
-      <button
-        onClick={onCreate}
-        className="bg-gray-600 hover:bg-gray-800 text-white p-2 rounded-lg flex items-center"
-      >
-        <PlusIcon size={20} className="mr-1" /> Thêm
-      </button>
-    )}
+    <div className="flex items-center gap-2">
+      {extraButtons}
+      {!createDisabled && (
+        <button
+          onClick={onCreate}
+          className="bg-gray-600 hover:bg-gray-800 text-white p-2 rounded-lg flex items-center"
+        >
+          <PlusIcon size={20} className="mr-1" /> Thêm
+        </button>
+      )}
+    </div>
   </div>
 );
 

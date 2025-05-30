@@ -6,6 +6,8 @@ import useFetch from "./hooks/useFetch";
 import NotFound from "./pages/NotFound";
 import User from "./pages/User";
 import Post from "./pages/Post";
+import Page from "./pages/Page";
+import Group from "./pages/Group";
 import Role from "./pages/Role";
 import Statistic from "./pages/Statistic";
 import Setting from "./pages/Setting";
@@ -50,6 +52,8 @@ const App = () => {
                 <>
                   <Route path="/" element={<User />} />
                   <Route path="/post" element={<Post />} />
+                  <Route path="/page" element={<Page />} />
+                  <Route path="/group" element={<Group />} />
                   <Route path="/statistic" element={<Statistic />} />
                   <Route path="/setting" element={<Setting />} />
                   <Route path="/role" element={<Role />} />
