@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import Breadcrumb from "../components/Breadcrumb";
 import {
   CircleCheckBigIcon,
-  CircleXIcon,
   ClockIcon,
   EarthIcon,
   UsersIcon,
@@ -49,7 +48,7 @@ interface ModerationSetting {
 }
 
 const Group = () => {
-  const { profile } = useGlobalContext();
+  // const { profile } = useGlobalContext();
   const { isDialogVisible, hideDialog, showDialog } = useDialog();
   const [groupId, setGroupId] = useState<string | null>(null);
   const [data, setData] = useState<GroupData[]>([]);
@@ -57,16 +56,16 @@ const Group = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [view, setView] = useState("list");
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [isGlobalAutoModerationEnabled, setIsGlobalAutoModerationEnabled] = useState(false);
+
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const itemsPerPage = 8;
-  const [moderationSettings, setModerationSettings] = useState<ModerationSetting[]>([]);
+  const [moderationSettings, setModerationSettings] = useState<
+    ModerationSetting[]
+  >([]);
 
   const handleSelectAllGroups = () => {
-    setSelectedGroups(prev => 
-      prev.length === data.length 
-        ? [] 
-        : data.map(group => group._id)
+    setSelectedGroups((prev) =>
+      prev.length === data.length ? [] : data.map((group) => group._id)
     );
   };
 
@@ -109,9 +108,10 @@ const Group = () => {
       accessor: "description",
       align: "left",
       render: (item: GroupData) => {
-        const description = item.description.length > 100
-          ? item.description.slice(0, 100) + "..."
-          : item.description;
+        const description =
+          item.description.length > 100
+            ? item.description.slice(0, 100) + "..."
+            : item.description;
         return (
           <div className="flex items-center gap-3">
             <div className="flex-1">
@@ -206,7 +206,10 @@ const Group = () => {
               }`}
               title={isEnabled ? "Tắt duyệt tự động" : "Bật duyệt tự động"}
             >
-              <ShieldCheckIcon size={18} className={isEnabled ? "animate-pulse" : ""} />
+              <ShieldCheckIcon
+                size={18}
+                className={isEnabled ? "animate-pulse" : ""}
+              />
             </button>
           </div>
         );
@@ -229,7 +232,9 @@ const Group = () => {
             <EyeIcon size={18} />
           </button>
           <button
-            onClick={() => handleChangeStatus(item._id, item.status === 1 ? 2 : 1)}
+            onClick={() =>
+              handleChangeStatus(item._id, item.status === 1 ? 2 : 1)
+            }
             className={`p-2 rounded-lg transition-colors ${
               item.status === 1
                 ? "text-green-600 hover:bg-green-50"
@@ -254,7 +259,7 @@ const Group = () => {
     },
   ];
 
-  const { get, post, put, del, loading } = useFetch();
+  const { get, put, del, loading } = useFetch();
   const [searchValues, setSearchValues] = useState({
     name: "",
     category: "",
@@ -311,10 +316,12 @@ const Group = () => {
     try {
       const res = await put(`/v1/group/change-state`, {
         id: groupId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã kích hoạt nhóm" : "Đã vô hiệu hóa nhóm");
+        toast.success(
+          newStatus === 2 ? "Đã kích hoạt nhóm" : "Đã vô hiệu hóa nhóm"
+        );
         await handleRefreshData();
       } else {
         toast.error(res.message);
@@ -351,30 +358,30 @@ const Group = () => {
       get("/v1/group/list", {
         page: 0,
         size: itemsPerPage,
-      }).then(res => {
+      }).then((res) => {
         setData(res.data.content);
         setTotalPages(res.data.totalPages);
       }),
-      fetchModerationSettings()
+      fetchModerationSettings(),
     ]);
   };
 
   const handleToggleAutoModeration = async (groupId?: string) => {
     try {
       if (groupId) {
-        const group = data.find(g => g._id === groupId);
+        const group = data.find((g) => g._id === groupId);
         if (!group) return;
-        
+
         const currentStatus = getGroupModerationStatus(groupId);
         console.log("Toggle single group:", { groupId, currentStatus });
-        
+
         const res = await put(`/v1/moderation-settings/group/${groupId}`, {
           isAutoModerationEnabled: !currentStatus,
           isModerationRequired: true,
-          groupId: groupId
+          groupId: groupId,
         });
         console.log("Single group toggle response:", res);
-        
+
         if (res.result) {
           toast.success(res.message);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
@@ -383,36 +390,42 @@ const Group = () => {
         }
       } else {
         // Kiểm tra trạng thái hiện tại của các nhóm được chọn
-        const selectedGroupsStatus = selectedGroups.map(groupId => ({
+        const selectedGroupsStatus = selectedGroups.map((groupId) => ({
           groupId,
-          status: getGroupModerationStatus(groupId)
+          status: getGroupModerationStatus(groupId),
         }));
         console.log("Selected groups status:", selectedGroupsStatus);
-        
-        const allEnabled = selectedGroupsStatus.every(item => item.status === true);
+
+        const allEnabled = selectedGroupsStatus.every(
+          (item) => item.status === true
+        );
         console.log("All enabled:", allEnabled);
-        
+
         // Cập nhật từng nhóm một
         const results = await Promise.all(
           selectedGroups.map(async (groupId) => {
             const res = await put(`/v1/moderation-settings/group/${groupId}`, {
               isAutoModerationEnabled: !allEnabled,
               isModerationRequired: true,
-              groupId: groupId
+              groupId: groupId,
             });
             return { groupId, success: res.result };
           })
         );
-        
+
         console.log("Multiple groups update results:", results);
-        
-        const allSuccess = results.every(r => r.success);
+
+        const allSuccess = results.every((r) => r.success);
         if (allSuccess) {
-          toast.success("Đã cập nhật cài đặt duyệt tự động cho tất cả các nhóm đã chọn");
+          toast.success(
+            "Đã cập nhật cài đặt duyệt tự động cho tất cả các nhóm đã chọn"
+          );
           setSelectedGroups([]);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
         } else {
-          toast.error("Có một số nhóm không thể cập nhật cài đặt duyệt tự động");
+          toast.error(
+            "Có một số nhóm không thể cập nhật cài đặt duyệt tự động"
+          );
         }
       }
     } catch (error) {
@@ -435,16 +448,18 @@ const Group = () => {
   };
 
   const getGroupModerationStatus = (groupId: string): boolean => {
-    const setting = moderationSettings.find(s => s.entityId === groupId);
+    const setting = moderationSettings.find((s) => s.entityId === groupId);
     return setting?.isAutoModerationEnabled || false;
   };
 
   const renderMultiSelectButton = () => {
     if (selectedGroups.length === 0) return null;
-    
-    const selectedGroupsStatus = selectedGroups.map(groupId => getGroupModerationStatus(groupId));
-    const allEnabled = selectedGroupsStatus.every(status => status === true);
-    
+
+    const selectedGroupsStatus = selectedGroups.map((groupId) =>
+      getGroupModerationStatus(groupId)
+    );
+    const allEnabled = selectedGroupsStatus.every((status) => status === true);
+
     return (
       <button
         onClick={handleExtraButtonClick}
@@ -453,7 +468,11 @@ const Group = () => {
             ? "bg-green-100 text-green-800 hover:bg-green-200"
             : "bg-gray-100 text-gray-800 hover:bg-gray-200"
         }`}
-        title={allEnabled ? "Tắt duyệt tự động cho các nhóm đã chọn" : "Bật duyệt tự động cho các nhóm đã chọn"}
+        title={
+          allEnabled
+            ? "Tắt duyệt tự động cho các nhóm đã chọn"
+            : "Bật duyệt tự động cho các nhóm đã chọn"
+        }
       >
         <ShieldCheckIcon size={20} />
       </button>
@@ -582,4 +601,4 @@ const Group = () => {
   );
 };
 
-export default Group; 
+export default Group;

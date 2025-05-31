@@ -10,13 +10,8 @@ import { toast } from "react-toastify";
 import Breadcrumb from "../components/Breadcrumb";
 import {
   CircleCheckBigIcon,
-  CircleXIcon,
   ClockIcon,
   EarthIcon,
-  EditIcon,
-  HeartIcon,
-  ImagesIcon,
-  LockIcon,
   MessageSquareIcon,
   UsersIcon,
   ShieldCheckIcon,
@@ -53,19 +48,21 @@ interface ModerationSetting {
 }
 
 const Page = () => {
-  const { profile } = useGlobalContext();
+  // const { profile } = useGlobalContext();
   const { isDialogVisible, hideDialog, showDialog } = useDialog();
   const [pageId, setPageId] = useState(null);
   const [data, setData] = useState<PageData[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [view, setView] = useState("list");
-  const [isAutoModerationEnabled, setIsAutoModerationEnabled] = useState(false);
+  // const [isAutoModerationEnabled, setIsAutoModerationEnabled] = useState(false);
   const itemsPerPage = 8;
   const [selectedPageId, setSelectedPageId] = useState(null);
   const [selectedPages, setSelectedPages] = useState<string[]>([]);
-  const [isGlobalAutoModerationEnabled, setIsGlobalAutoModerationEnabled] = useState(false);
-  const [moderationSettings, setModerationSettings] = useState<ModerationSetting[]>([]);
+  // const [isGlobalAutoModerationEnabled, setIsGlobalAutoModerationEnabled] = useState(false);
+  const [moderationSettings, setModerationSettings] = useState<
+    ModerationSetting[]
+  >([]);
 
   const columns = [
     {
@@ -106,9 +103,10 @@ const Page = () => {
       accessor: "description",
       align: "left",
       render: (item: any) => {
-        const description = item.description.length > 100
-          ? item.description.slice(0, 100) + "..."
-          : item.description;
+        const description =
+          item.description.length > 100
+            ? item.description.slice(0, 100) + "..."
+            : item.description;
         return (
           <div className="flex items-center gap-3">
             <div className="flex-1">
@@ -203,7 +201,10 @@ const Page = () => {
               }`}
               title={isEnabled ? "Tắt duyệt tự động" : "Bật duyệt tự động"}
             >
-              <ShieldCheckIcon size={18} className={isEnabled ? "animate-pulse" : ""} />
+              <ShieldCheckIcon
+                size={18}
+                className={isEnabled ? "animate-pulse" : ""}
+              />
             </button>
           </div>
         );
@@ -226,7 +227,9 @@ const Page = () => {
             <EyeIcon size={18} />
           </button>
           <button
-            onClick={() => handleChangeStatus(item._id, item.status === 1 ? 2 : 1)}
+            onClick={() =>
+              handleChangeStatus(item._id, item.status === 1 ? 2 : 1)
+            }
             className={`p-2 rounded-lg transition-colors ${
               item.status === 1
                 ? "text-green-600 hover:bg-green-50"
@@ -251,7 +254,7 @@ const Page = () => {
     },
   ];
 
-  const { get, post, put, del, loading } = useFetch();
+  const { get, put, del, loading } = useFetch();
   const [searchValues, setSearchValues] = useState({
     name: "",
     category: "",
@@ -309,10 +312,12 @@ const Page = () => {
     try {
       const res = await put(`/v1/page/change-state`, {
         id: pageId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang");
+        toast.success(
+          newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
+        );
         await handleRefreshData();
       } else {
         toast.error(res.message);
@@ -355,7 +360,7 @@ const Page = () => {
   };
 
   const getPageModerationStatus = (pageId: string): boolean => {
-    const setting = moderationSettings.find(s => s.entityId === pageId);
+    const setting = moderationSettings.find((s) => s.entityId === pageId);
     console.log("Getting moderation status for page:", { pageId, setting });
     return setting?.isAutoModerationEnabled || false;
   };
@@ -363,19 +368,19 @@ const Page = () => {
   const handleToggleAutoModeration = async (pageId?: string) => {
     try {
       if (pageId) {
-        const page = data.find(p => p._id === pageId);
+        const page = data.find((p) => p._id === pageId);
         if (!page) return;
-        
+
         const currentStatus = getPageModerationStatus(pageId);
         console.log("Toggle single page:", { pageId, currentStatus });
-        
+
         const res = await put(`/v1/moderation-settings/page`, {
           isAutoModerationEnabled: !currentStatus,
           isModerationRequired: true,
-          pageId: pageId
+          pageId: pageId,
         });
         console.log("Single page toggle response:", res);
-        
+
         if (res.result) {
           toast.success(res.message);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
@@ -384,36 +389,42 @@ const Page = () => {
         }
       } else {
         // Kiểm tra trạng thái hiện tại của các trang được chọn
-        const selectedPagesStatus = selectedPages.map(pageId => ({
+        const selectedPagesStatus = selectedPages.map((pageId) => ({
           pageId,
-          status: getPageModerationStatus(pageId)
+          status: getPageModerationStatus(pageId),
         }));
         console.log("Selected pages status:", selectedPagesStatus);
-        
-        const allEnabled = selectedPagesStatus.every(item => item.status === true);
+
+        const allEnabled = selectedPagesStatus.every(
+          (item) => item.status === true
+        );
         console.log("All enabled:", allEnabled);
-        
+
         // Cập nhật từng trang một
         const results = await Promise.all(
           selectedPages.map(async (pageId) => {
             const res = await put(`/v1/moderation-settings/page`, {
               isAutoModerationEnabled: !allEnabled,
               isModerationRequired: true,
-              pageId: pageId
+              pageId: pageId,
             });
             return { pageId, success: res.result };
           })
         );
-        
+
         console.log("Multiple pages update results:", results);
-        
-        const allSuccess = results.every(r => r.success);
+
+        const allSuccess = results.every((r) => r.success);
         if (allSuccess) {
-          toast.success("Đã cập nhật cài đặt duyệt tự động cho tất cả các trang đã chọn");
+          toast.success(
+            "Đã cập nhật cài đặt duyệt tự động cho tất cả các trang đã chọn"
+          );
           setSelectedPages([]);
           await Promise.all([handleRefreshData(), fetchModerationSettings()]);
         } else {
-          toast.error("Có một số trang không thể cập nhật cài đặt duyệt tự động");
+          toast.error(
+            "Có một số trang không thể cập nhật cài đặt duyệt tự động"
+          );
         }
       }
     } catch (error) {
@@ -423,18 +434,16 @@ const Page = () => {
   };
 
   const handleSelectPage = (pageId: string) => {
-    setSelectedPages(prev => 
-      prev.includes(pageId) 
-        ? prev.filter(id => id !== pageId)
+    setSelectedPages((prev) =>
+      prev.includes(pageId)
+        ? prev.filter((id) => id !== pageId)
         : [...prev, pageId]
     );
   };
 
   const handleSelectAllPages = () => {
-    setSelectedPages(prev => 
-      prev.length === data.length 
-        ? [] 
-        : data.map(page => page._id)
+    setSelectedPages((prev) =>
+      prev.length === data.length ? [] : data.map((page) => page._id)
     );
   };
 
@@ -445,10 +454,12 @@ const Page = () => {
 
   const renderMultiSelectButton = () => {
     if (selectedPages.length === 0) return null;
-    
-    const selectedPagesStatus = selectedPages.map(pageId => getPageModerationStatus(pageId));
-    const allEnabled = selectedPagesStatus.every(status => status === true);
-    
+
+    const selectedPagesStatus = selectedPages.map((pageId) =>
+      getPageModerationStatus(pageId)
+    );
+    const allEnabled = selectedPagesStatus.every((status) => status === true);
+
     return (
       <button
         onClick={handleExtraButtonClick}
@@ -457,7 +468,11 @@ const Page = () => {
             ? "bg-green-100 text-green-800 hover:bg-green-200"
             : "bg-gray-100 text-gray-800 hover:bg-gray-200"
         }`}
-        title={allEnabled ? "Tắt duyệt tự động cho các trang đã chọn" : "Bật duyệt tự động cho các trang đã chọn"}
+        title={
+          allEnabled
+            ? "Tắt duyệt tự động cho các trang đã chọn"
+            : "Bật duyệt tự động cho các trang đã chọn"
+        }
       >
         <ShieldCheckIcon size={20} />
       </button>
@@ -586,4 +601,4 @@ const Page = () => {
   );
 };
 
-export default Page; 
+export default Page;

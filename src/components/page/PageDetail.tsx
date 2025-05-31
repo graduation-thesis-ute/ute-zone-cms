@@ -11,7 +11,6 @@ import {
   CalendarIcon,
   UserIcon,
   ShieldCheckIcon,
-  EditIcon,
   TrashIcon,
   PowerIcon,
   ChevronLeftIcon,
@@ -46,7 +45,13 @@ interface PagePost {
   createdAt: string;
 }
 
-const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) => {
+const PageDetail = ({
+  pageId,
+  onBack,
+}: {
+  pageId: string;
+  onBack: () => void;
+}) => {
   const [page, setPage] = useState<any>(null);
   const [members, setMembers] = useState<PageMember[]>([]);
   const [posts, setPosts] = useState<PagePost[]>([]);
@@ -81,7 +86,7 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
       try {
         const res = await get(`/v1/page-member/members/${pageId}`, {
           page: currentMemberPage,
-          size: itemsPerPage
+          size: itemsPerPage,
         });
         if (res.result) {
           setMembers(res.data.content);
@@ -103,7 +108,7 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
         const res = await get(`/v1/page-post/list`, {
           pageId,
           page: currentPostPage,
-          size: itemsPerPage
+          size: itemsPerPage,
         });
         if (res.result) {
           setPosts(res.data.content);
@@ -122,10 +127,12 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
     try {
       const res = await put(`/v1/page/change-state`, {
         id: pageId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang");
+        toast.success(
+          newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
+        );
         setPage({ ...page, status: newStatus });
       } else {
         toast.error(res.message);
@@ -154,12 +161,12 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
     try {
       const res = await put(`/v1/page-member/update-role`, {
         pageMemberId: memberId,
-        role: newRole
+        role: newRole,
       });
       if (res.result) {
         toast.success("Cập nhật vai trò thành công");
         // Refresh members list
-        const updatedMembers = members.map(member => 
+        const updatedMembers = members.map((member) =>
           member._id === memberId ? { ...member, role: newRole } : member
         );
         setMembers(updatedMembers);
@@ -176,7 +183,7 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
       const res = await del(`/v1/page-member/remove/${memberId}`);
       if (res.result) {
         toast.success("Xóa thành viên thành công");
-        setMembers(members.filter(member => member._id !== memberId));
+        setMembers(members.filter((member) => member._id !== memberId));
       } else {
         toast.error(res.message);
       }
@@ -189,14 +196,18 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
     try {
       const res = await put(`/v1/page-post/change-state`, {
         id: postId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã duyệt bài đăng" : "Đã từ chối bài đăng");
+        toast.success(
+          newStatus === 2 ? "Đã duyệt bài đăng" : "Đã từ chối bài đăng"
+        );
         // Update post status in the list
-        setPosts(posts.map(post => 
-          post._id === postId ? { ...post, status: newStatus } : post
-        ));
+        setPosts(
+          posts.map((post) =>
+            post._id === postId ? { ...post, status: newStatus } : post
+          )
+        );
       } else {
         toast.error(res.message);
       }
@@ -210,7 +221,7 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
       const res = await del(`/v1/page-post/delete/${postId}`);
       if (res.result) {
         toast.success("Xóa bài đăng thành công");
-        setPosts(posts.filter(post => post._id !== postId));
+        setPosts(posts.filter((post) => post._id !== postId));
       } else {
         toast.error(res.message);
       }
@@ -306,7 +317,9 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
               <UsersIcon className="text-emerald-500" size={20} />
               <span className="text-gray-600">Thành viên</span>
             </div>
-            <span className="text-xl font-semibold">{page.totalMembers || 0}</span>
+            <span className="text-xl font-semibold">
+              {page.totalMembers || 0}
+            </span>
           </div>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
@@ -315,7 +328,9 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
               <MessageSquareIcon className="text-indigo-500" size={20} />
               <span className="text-gray-600">Bài đăng</span>
             </div>
-            <span className="text-xl font-semibold">{page.totalPosts || 0}</span>
+            <span className="text-xl font-semibold">
+              {page.totalPosts || 0}
+            </span>
           </div>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
@@ -374,13 +389,17 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
                   />
                   <div>
                     <div className="font-medium">{member.user.displayName}</div>
-                    <div className="text-sm text-gray-500">@{member.user.username}</div>
+                    <div className="text-sm text-gray-500">
+                      @{member.user.username}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <select
                     value={member.role}
-                    onChange={(e) => handleUpdateMemberRole(member._id, Number(e.target.value))}
+                    onChange={(e) =>
+                      handleUpdateMemberRole(member._id, Number(e.target.value))
+                    }
                     className="border rounded px-2 py-1 text-sm"
                   >
                     <option value={1}>Thành viên</option>
@@ -403,7 +422,9 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
         {totalMemberPages > 1 && (
           <div className="flex justify-center mt-4 space-x-2">
             <button
-              onClick={() => setCurrentMemberPage(prev => Math.max(0, prev - 1))}
+              onClick={() =>
+                setCurrentMemberPage((prev) => Math.max(0, prev - 1))
+              }
               disabled={currentMemberPage === 0}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -413,7 +434,11 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
               Trang {currentMemberPage + 1} / {totalMemberPages}
             </span>
             <button
-              onClick={() => setCurrentMemberPage(prev => Math.min(totalMemberPages - 1, prev + 1))}
+              onClick={() =>
+                setCurrentMemberPage((prev) =>
+                  Math.min(totalMemberPages - 1, prev + 1)
+                )
+              }
               disabled={currentMemberPage === totalMemberPages - 1}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -519,7 +544,9 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
         {totalPostPages > 1 && (
           <div className="flex justify-center mt-4 space-x-2">
             <button
-              onClick={() => setCurrentPostPage(prev => Math.max(0, prev - 1))}
+              onClick={() =>
+                setCurrentPostPage((prev) => Math.max(0, prev - 1))
+              }
               disabled={currentPostPage === 0}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -529,7 +556,11 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
               Trang {currentPostPage + 1} / {totalPostPages}
             </span>
             <button
-              onClick={() => setCurrentPostPage(prev => Math.min(totalPostPages - 1, prev + 1))}
+              onClick={() =>
+                setCurrentPostPage((prev) =>
+                  Math.min(totalPostPages - 1, prev + 1)
+                )
+              }
               disabled={currentPostPage === totalPostPages - 1}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -563,4 +594,4 @@ const PageDetail = ({ pageId, onBack }: { pageId: string; onBack: () => void }) 
   );
 };
 
-export default PageDetail; 
+export default PageDetail;

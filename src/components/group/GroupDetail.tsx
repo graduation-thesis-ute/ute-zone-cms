@@ -11,7 +11,6 @@ import {
   CalendarIcon,
   UserIcon,
   ShieldCheckIcon,
-  EditIcon,
   TrashIcon,
   PowerIcon,
   ChevronLeftIcon,
@@ -46,7 +45,13 @@ interface GroupPost {
   createdAt: string;
 }
 
-const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void }) => {
+const GroupDetail = ({
+  groupId,
+  onBack,
+}: {
+  groupId: string;
+  onBack: () => void;
+}) => {
   const [group, setGroup] = useState<any>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [posts, setPosts] = useState<GroupPost[]>([]);
@@ -85,7 +90,7 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
         const res = await get(`/v1/group-member/list`, {
           groupId,
           page: currentMemberPage,
-          size: itemsPerPage
+          size: itemsPerPage,
         });
         console.log("Members API response:", res);
         if (res.result) {
@@ -114,7 +119,7 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
         const res = await get(`/v1/group-post/list`, {
           groupId,
           page: currentPostPage,
-          size: itemsPerPage
+          size: itemsPerPage,
         });
         if (res.result) {
           setPosts(res.data.content);
@@ -134,10 +139,12 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
     try {
       const res = await put(`/v1/group/change-state`, {
         id: groupId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã kích hoạt nhóm" : "Đã vô hiệu hóa nhóm");
+        toast.success(
+          newStatus === 2 ? "Đã kích hoạt nhóm" : "Đã vô hiệu hóa nhóm"
+        );
         setGroup({ ...group, status: newStatus });
       } else {
         toast.error(res.message);
@@ -166,11 +173,11 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
     try {
       const res = await put(`/v1/group-member/update-role`, {
         groupMemberId: memberId,
-        role: newRole
+        role: newRole,
       });
       if (res.result) {
         toast.success("Cập nhật vai trò thành công");
-        const updatedMembers = members.map(member => 
+        const updatedMembers = members.map((member) =>
           member._id === memberId ? { ...member, role: newRole } : member
         );
         setMembers(updatedMembers);
@@ -187,7 +194,7 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
       const res = await del(`/v1/group-member/remove/${memberId}`);
       if (res.result) {
         toast.success("Xóa thành viên thành công");
-        setMembers(members.filter(member => member._id !== memberId));
+        setMembers(members.filter((member) => member._id !== memberId));
       } else {
         toast.error(res.message);
       }
@@ -200,13 +207,17 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
     try {
       const res = await put(`/v1/group-post/change-state`, {
         id: postId,
-        status: newStatus
+        status: newStatus,
       });
       if (res.result) {
-        toast.success(newStatus === 2 ? "Đã duyệt bài đăng" : "Đã từ chối bài đăng");
-        setPosts(posts.map(post => 
-          post._id === postId ? { ...post, status: newStatus } : post
-        ));
+        toast.success(
+          newStatus === 2 ? "Đã duyệt bài đăng" : "Đã từ chối bài đăng"
+        );
+        setPosts(
+          posts.map((post) =>
+            post._id === postId ? { ...post, status: newStatus } : post
+          )
+        );
       } else {
         toast.error(res.message);
       }
@@ -220,7 +231,7 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
       const res = await del(`/v1/group-post/delete/${postId}`);
       if (res.result) {
         toast.success("Xóa bài đăng thành công");
-        setPosts(posts.filter(post => post._id !== postId));
+        setPosts(posts.filter((post) => post._id !== postId));
       } else {
         toast.error(res.message);
       }
@@ -318,7 +329,9 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xl font-semibold">{totalMembers}</span>
-              <span className="text-sm text-gray-500">({members.length} trong trang)</span>
+              <span className="text-sm text-gray-500">
+                ({members.length} trong trang)
+              </span>
             </div>
           </div>
         </div>
@@ -387,13 +400,17 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
                   />
                   <div>
                     <div className="font-medium">{member.user.displayName}</div>
-                    <div className="text-sm text-gray-500">@{member.user.username}</div>
+                    <div className="text-sm text-gray-500">
+                      @{member.user.username}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <select
                     value={member.role}
-                    onChange={(e) => handleUpdateMemberRole(member._id, Number(e.target.value))}
+                    onChange={(e) =>
+                      handleUpdateMemberRole(member._id, Number(e.target.value))
+                    }
                     className="border rounded px-2 py-1 text-sm"
                   >
                     <option value={1}>Thành viên</option>
@@ -416,7 +433,9 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
         {totalMemberPages > 1 && (
           <div className="flex justify-center mt-4 space-x-2">
             <button
-              onClick={() => setCurrentMemberPage(prev => Math.max(0, prev - 1))}
+              onClick={() =>
+                setCurrentMemberPage((prev) => Math.max(0, prev - 1))
+              }
               disabled={currentMemberPage === 0}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -426,7 +445,11 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
               Trang {currentMemberPage + 1} / {totalMemberPages}
             </span>
             <button
-              onClick={() => setCurrentMemberPage(prev => Math.min(totalMemberPages - 1, prev + 1))}
+              onClick={() =>
+                setCurrentMemberPage((prev) =>
+                  Math.min(totalMemberPages - 1, prev + 1)
+                )
+              }
               disabled={currentMemberPage === totalMemberPages - 1}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -532,7 +555,9 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
         {totalPostPages > 1 && (
           <div className="flex justify-center mt-4 space-x-2">
             <button
-              onClick={() => setCurrentPostPage(prev => Math.max(0, prev - 1))}
+              onClick={() =>
+                setCurrentPostPage((prev) => Math.max(0, prev - 1))
+              }
               disabled={currentPostPage === 0}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -542,7 +567,11 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
               Trang {currentPostPage + 1} / {totalPostPages}
             </span>
             <button
-              onClick={() => setCurrentPostPage(prev => Math.min(totalPostPages - 1, prev + 1))}
+              onClick={() =>
+                setCurrentPostPage((prev) =>
+                  Math.min(totalPostPages - 1, prev + 1)
+                )
+              }
               disabled={currentPostPage === totalPostPages - 1}
               className="p-2 rounded-lg bg-gray-100 disabled:opacity-50"
             >
@@ -576,4 +605,4 @@ const GroupDetail = ({ groupId, onBack }: { groupId: string; onBack: () => void 
   );
 };
 
-export default GroupDetail; 
+export default GroupDetail;

@@ -178,7 +178,7 @@ const Post = () => {
     },
   ];
 
-  const { get, post, put,del, loading } = useFetch();
+  const { get, put, del, loading } = useFetch();
   const [searchValues, setSearchValues] = useState({
     content: "",
     user: "",
@@ -270,7 +270,7 @@ const Post = () => {
     try {
       const res = await put("/v1/moderation-settings/global", {
         isAutoModerationEnabled: !isAutoModerationEnabled,
-        isModerationRequired: true
+        isModerationRequired: true,
       });
       console.log("Update moderation setting response:", res);
       if (res.result) {
@@ -315,11 +315,17 @@ const Post = () => {
                           ? "bg-green-100 text-green-800 hover:bg-green-200"
                           : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                       }`}
-                      title={isAutoModerationEnabled ? "Tắt duyệt tự động" : "Bật duyệt tự động"}
+                      title={
+                        isAutoModerationEnabled
+                          ? "Tắt duyệt tự động"
+                          : "Bật duyệt tự động"
+                      }
                     >
                       <ShieldCheckIcon size={20} />
                       <span>
-                        {isAutoModerationEnabled ? "Đang bật duyệt tự động" : "Đang tắt duyệt tự động"}
+                        {isAutoModerationEnabled
+                          ? "Đang bật duyệt tự động"
+                          : "Đang tắt duyệt tự động"}
                       </span>
                     </button>
                   }
