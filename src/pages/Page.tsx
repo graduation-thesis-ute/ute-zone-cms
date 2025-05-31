@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import userImg from "../assets/user_icon.png";
-import { useGlobalContext } from "../types/context";
 import PageDetail from "../components/page/PageDetail";
 
 interface PageData {
