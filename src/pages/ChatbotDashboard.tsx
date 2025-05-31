@@ -132,10 +132,10 @@ const ChatbotDashboard = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                Chatbot Analytics
+                Phân Tích Chatbot
               </h1>
               <p className="text-gray-600 text-lg">
-                Monitor your chatbot's performance and insights
+                Theo dõi hiệu suất và thông tin chi tiết của chatbot
               </p>
             </div>
 
@@ -143,7 +143,7 @@ const ChatbotDashboard = () => {
             <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700 mb-1">
-                  From
+                  Từ ngày
                 </label>
                 <input
                   type="date"
@@ -159,7 +159,7 @@ const ChatbotDashboard = () => {
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700 mb-1">
-                  To
+                  Đến ngày
                 </label>
                 <input
                   type="date"
@@ -198,7 +198,7 @@ const ChatbotDashboard = () => {
               </div>
             </div>
             <h3 className="text-gray-500 text-sm font-medium mb-1">
-              Total Queries
+              Tổng số câu hỏi
             </h3>
             <p className="text-3xl font-bold text-gray-900">
               {stats.totalQueries.toLocaleString()}
@@ -224,7 +224,7 @@ const ChatbotDashboard = () => {
               </div>
             </div>
             <h3 className="text-gray-500 text-sm font-medium mb-1">
-              Avg Response Time
+              Thời gian phản hồi trung bình
             </h3>
             <p className="text-3xl font-bold text-gray-900">
               {stats.averageResponseTime.toFixed(2)}s
@@ -250,7 +250,7 @@ const ChatbotDashboard = () => {
               </div>
             </div>
             <h3 className="text-gray-500 text-sm font-medium mb-1">
-              Success Rate
+              Tỷ lệ thành công
             </h3>
             <p className="text-3xl font-bold text-gray-900">
               {stats.successRate.toFixed(1)}%
@@ -276,7 +276,7 @@ const ChatbotDashboard = () => {
               </div>
             </div>
             <h3 className="text-gray-500 text-sm font-medium mb-1">
-              Active Users
+              Người dùng hoạt động
             </h3>
             <p className="text-3xl font-bold text-gray-900">
               {stats.activeUsers}
@@ -291,10 +291,10 @@ const ChatbotDashboard = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  Queries Over Time
+                  Số lượng câu hỏi theo thời gian
                 </h3>
                 <p className="text-gray-500 text-sm mt-1">
-                  Daily query volume trends
+                  Xu hướng số lượng câu hỏi hàng ngày
                 </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -343,7 +343,7 @@ const ChatbotDashboard = () => {
                     strokeWidth={3}
                     dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                     activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2 }}
-                    name="Number of Queries"
+                    name="Số lượng câu hỏi"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -355,10 +355,10 @@ const ChatbotDashboard = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  Response Time Trends
+                  Xu hướng thời gian phản hồi
                 </h3>
                 <p className="text-gray-500 text-sm mt-1">
-                  Average response time over time
+                  Thời gian phản hồi trung bình theo thời gian
                 </p>
               </div>
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -407,7 +407,7 @@ const ChatbotDashboard = () => {
                     strokeWidth={3}
                     dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
                     activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2 }}
-                    name="Average Response Time (s)"
+                    name="Thời gian phản hồi trung bình (s)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -420,10 +420,10 @@ const ChatbotDashboard = () => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-semibold text-gray-900">
-                Most Asked Questions
+                Câu hỏi được hỏi nhiều nhất
               </h3>
               <p className="text-gray-500 text-sm mt-1">
-                Top 10 frequently asked questions
+                10 câu hỏi thường gặp nhất
               </p>
             </div>
             <div className="p-2 bg-green-100 rounded-lg">
@@ -469,7 +469,7 @@ const ChatbotDashboard = () => {
                 <Bar
                   dataKey="count"
                   fill="url(#colorGradient)"
-                  name="Number of Times Asked"
+                  name="Số lần được hỏi"
                   radius={[0, 8, 8, 0]}
                 />
                 <defs>

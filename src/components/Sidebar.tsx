@@ -102,7 +102,7 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
     },
     {
       name: "chatbot-dashboard",
-      label: "Dashboard Chatbot",
+      label: "Thống kê Chatbot",
       icon: <ChartPieIcon size={20} />,
       path: "/chatbot-dashboard",
     },
@@ -120,7 +120,7 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
     },
     {
       name: "statistic",
-      label: "Thống kê",
+      label: "Thống kê hệ thống",
       icon: <ChartPieIcon size={20} />,
       path: "/statistic",
     },
