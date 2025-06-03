@@ -90,7 +90,7 @@ const Sidebar = ({ activeItem, renderContent }: any) => {
     },
     {
       name: "document",
-      label: "Quản lý tài liệu",
+      label: "Quản lý tài liệu Chatbot",
       icon: <FileTextIcon size={20} />,
       path: "/document",
     },
