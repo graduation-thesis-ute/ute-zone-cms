@@ -113,7 +113,7 @@ const UpdateProfile = ({ isVisible, setVisible, userId, onUpdate }: any) => {
           ? await uploadImage(avatarPreview, post)
           : form.avatarUrl,
       };
-      const res = await put("/v1/user/update-profile", updatedForm);
+      const res = await put("/v1/user/profile", updatedForm);
       if (res.result) {
         toast.success("Cập nhật thành công");
         setVisible(false);

@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import useFetch from "../hooks/useFetch";
 import Sidebar from "../components/Sidebar";
 import { LoadingDialog } from "../components/Dialog";
+import { toast } from "react-toastify";
 
 interface ChatbotStats {
   totalQueries: number;
@@ -58,11 +59,14 @@ const ChatbotDashboard = () => {
       if (response.result && response.data) {
         setStats(response.data);
       } else {
-        setError(response.error || "Failed to load statistics");
+        const errorMessage = response.error || "Failed to load statistics";
+        setError(errorMessage);
+        console.error("API Error:", errorMessage);
       }
     } catch (error) {
       console.error("Error fetching stats:", error);
-      setError("Failed to load statistics");
+      const errorMessage = "Failed to load statistics";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -72,33 +76,14 @@ const ChatbotDashboard = () => {
     fetchStats();
   }, [dateRange]);
 
-  const renderContent = () => {
+  useEffect(() => {
     if (error) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100">
-          <div className="text-center p-8 bg-white rounded-2xl shadow-lg border border-red-200">
-            <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <p className="text-red-600 font-medium text-lg">{error}</p>
-          </div>
-        </div>
-      );
+      toast.error(error);
     }
+  }, [error]);
 
-    if (!stats) {
+  const renderContent = () => {
+    if (!stats && !loading) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
           <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
@@ -118,11 +103,15 @@ const ChatbotDashboard = () => {
               </svg>
             </div>
             <p className="text-gray-600 font-medium text-lg">
-              No data available
+              Không có dữ liệu
             </p>
           </div>
         </div>
       );
+    }
+
+    if (!stats) {
+      return null;
     }
 
     return (
