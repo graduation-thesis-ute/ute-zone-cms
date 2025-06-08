@@ -15,6 +15,6 @@ const settingKey = {
 };
 
 const remoteUrl = "https://ute-zone-backend.onrender.com";
-//const remoteUrl = "http://localhost:7979";
+//  const remoteUrl = "http://localhost:7979";
 
 export { EmailPattern, settingKey, PhonePattern, remoteUrl, StudentIdPattern };
