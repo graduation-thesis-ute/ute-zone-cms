@@ -14,7 +14,7 @@ const settingKey = {
   MAX_CONVERSATIONS: "max_conversations",
 };
 
-//const remoteUrl = "https://ute-zone-backend.onrender.com";
- const remoteUrl = "http://localhost:7979";
+const remoteUrl = "https://ute-zone-backend.onrender.com";
+//  const remoteUrl = "http://localhost:7979";
 
 export { EmailPattern, settingKey, PhonePattern, remoteUrl, StudentIdPattern };
