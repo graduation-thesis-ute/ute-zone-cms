@@ -65,7 +65,7 @@ const ChatbotDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching stats:", error);
-      const errorMessage = "Failed to load statistics";
+      const errorMessage = "Tải dữ liệu thất bại";
       setError(errorMessage);
     } finally {
       setLoading(false);
