@@ -131,7 +131,7 @@ const PageDetail = ({
       });
       if (res.result) {
         toast.success(
-          newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
+          newStatus === 1 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
         );
         setPage({ ...page, status: newStatus });
       } else {
@@ -252,10 +252,10 @@ const PageDetail = ({
             onClick={() => handleChangeStatus(page.status === 1 ? 2 : 1)}
             className={`p-2 rounded-lg transition-colors ${
               page.status === 1
-                ? "text-green-600 hover:bg-green-50"
-                : "text-yellow-600 hover:bg-yellow-50"
+                ? "text-yellow-600 hover:bg-yellow-50"
+                : "text-green-600 hover:bg-green-50"
             }`}
-            title={page.status === 1 ? "Kích hoạt trang" : "Vô hiệu hóa trang"}
+            title={page.status === 1 ? "Vô hiệu hóa trang" : "Kích hoạt trang"}
           >
             <PowerIcon size={20} />
           </button>
@@ -271,19 +271,26 @@ const PageDetail = ({
           <span
             className={`inline-flex items-center gap-1 px-3 py-1 rounded-md ${
               page.status === 1
+                ? "bg-green-100 text-green-800"
+                : page.status === 2
                 ? "bg-yellow-100 text-yellow-800"
-                : "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
             }`}
           >
             {page.status === 1 ? (
+              <>
+                <CircleCheckBigIcon size={16} />
+                Đã kích hoạt
+              </>
+            ) : page.status === 2 ? (
               <>
                 <ClockIcon size={16} />
                 Chưa kích hoạt
               </>
             ) : (
               <>
-                <CircleCheckBigIcon size={16} />
-                Đã kích hoạt
+                <TrashIcon size={16} />
+                Đã xóa
               </>
             )}
           </span>
