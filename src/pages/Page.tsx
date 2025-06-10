@@ -9,15 +9,15 @@ import useDialog from "../hooks/useDialog";
 import { toast } from "react-toastify";
 import Breadcrumb from "../components/Breadcrumb";
 import {
-  CircleCheckBigIcon,
-  ClockIcon,
+  // CircleCheckBigIcon,
+  // ClockIcon,
   EarthIcon,
   MessageSquareIcon,
   UsersIcon,
   ShieldCheckIcon,
   EyeIcon,
   TrashIcon,
-  PowerIcon,
+  //PowerIcon,
   CheckSquareIcon,
   SquareIcon,
 } from "lucide-react";
@@ -268,24 +268,24 @@ const Page = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleChangeStatus = async (pageId: string, newStatus: number) => {
-    try {
-      const res = await put(`/v1/page/change-state`, {
-        id: pageId,
-        status: newStatus,
-      });
-      if (res.result) {
-        toast.success(
-          newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
-        );
-        await handleRefreshData();
-      } else {
-        toast.error(res.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi thay đổi trạng thái");
-    }
-  };
+  // const handleChangeStatus = async (pageId: string, newStatus: number) => {
+  //   try {
+  //     const res = await put(`/v1/page/change-state`, {
+  //       id: pageId,
+  //       status: newStatus,
+  //     });
+  //     if (res.result) {
+  //       toast.success(
+  //         newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
+  //       );
+  //       await handleRefreshData();
+  //     } else {
+  //       toast.error(res.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Có lỗi xảy ra khi thay đổi trạng thái");
+  //   }
+  // };
 
   const handleDelete = async () => {
     hideDialog();
