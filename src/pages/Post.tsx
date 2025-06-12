@@ -23,6 +23,7 @@ import {
   MessageSquareIcon,
   UsersIcon,
   ShieldCheckIcon,
+  X,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import PostReview from "../components/post/PostReview";
@@ -43,6 +44,8 @@ const Post = () => {
   const [view, setView] = useState("list");
   const [isAutoModerationEnabled, setIsAutoModerationEnabled] = useState(false);
   const itemsPerPage = 8;
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const columns = [
     {
@@ -71,7 +74,13 @@ const Post = () => {
             ? item.content.slice(0, 100) + "..."
             : item.content;
         return (
-          <div className="flex items-center gap-3">
+          <div 
+            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+            onClick={() => {
+              setSelectedPostId(item._id);
+              setDetailModalVisible(true);
+            }}
+          >
             <div className="flex-1">
               <div className="flex items-center gap-1 text-gray-600">
                 {item.isUpdated === 1 && (
@@ -440,6 +449,24 @@ const Post = () => {
         profile={profile}
         onButtonClick={handleClear}
       />
+      {detailModalVisible && selectedPostId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-end p-2">
+              <button 
+                onClick={() => {
+                  setDetailModalVisible(false);
+                  setSelectedPostId(null);
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <PostDetail postId={selectedPostId} />
+          </div>
+        </div>
+      )}
     </>
   );
 };
