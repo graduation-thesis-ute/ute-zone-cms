@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   CheckIcon,
   BellIcon,
@@ -10,16 +10,88 @@ import {
 import useFetch from "../hooks/useFetch";
 import { ConfimationDialog } from "./Dialog";
 import useDialog from "../hooks/useDialog";
+import { useBrowserNotification } from "../hooks/useBrowserNotification";
+
+interface NotificationItem {
+  _id: string;
+  message: string;
+  status: number;
+  createdAt: string;
+}
 
 const Notification = ({ isOpen, setIsOpen }: any) => {
   const { isDialogVisible, showDialog, hideDialog } = useDialog();
   const [activeTab, setActiveTab] = useState(1);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const { get, put, del, loading } = useFetch();
+  const { permission, requestPermission, showNotification, isSupported } = useBrowserNotification();
+  const previousNotificationsRef = useRef<NotificationItem[]>([]);
+  const originalTitleRef = useRef(document.title);
 
   useEffect(() => {
     fetchNotifications();
+    // Set up polling for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => {
+      clearInterval(interval);
+      // Restore original title when component unmounts
+      document.title = originalTitleRef.current;
+    };
   }, []);
+
+  useEffect(() => {
+    // Find new notifications
+    const newNotifications = notifications.filter(
+      (newNotif) => 
+        !previousNotificationsRef.current.some(
+          (oldNotif) => oldNotif._id === newNotif._id
+        )
+    );
+
+    // Get the latest unread notification
+    const latestUnread = notifications
+      .filter((n) => n.status === 1)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+    // Update browser tab title
+    if (latestUnread) {
+      // Truncate message if too long (max 30 characters)
+      const truncatedMessage = latestUnread.message.length > 30 
+        ? latestUnread.message.substring(0, 30) + '...' 
+        : latestUnread.message;
+      
+      document.title = `(${notifications.filter((n) => n.status === 1).length}) ${truncatedMessage} - ${originalTitleRef.current}`;
+    } else {
+      document.title = originalTitleRef.current;
+    }
+
+    // Update previous notifications reference
+    previousNotificationsRef.current = notifications;
+  }, [notifications]);
+
+  useEffect(() => {
+    // Check for new notifications and show browser notification
+    if (notifications.length > 0 && previousNotificationsRef.current.length > 0) {
+      const newNotifications = notifications.filter(
+        (newNotif) => 
+          !previousNotificationsRef.current.some(
+            (oldNotif) => oldNotif._id === newNotif._id
+          )
+      );
+
+      newNotifications.forEach((notification) => {
+        if (notification.status === 1) { // Only show for unread notifications
+          showNotification({
+            title: 'UTEZone - Thông báo mới',
+            body: notification.message,
+            tag: 'utezone-notification',
+            requireInteraction: false,
+          });
+        }
+      });
+    }
+    previousNotificationsRef.current = notifications;
+  }, [notifications]);
 
   useEffect(() => {
     const closeOnEscapeKey = (e: any) =>
@@ -81,7 +153,18 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
           <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">Thông báo</h2>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-lg font-semibold">Thông báo</h2>
+                {isSupported && permission !== 'granted' && (
+                  <button
+                    onClick={requestPermission}
+                    className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors"
+                  >
+                    <BellIcon className="h-3 w-3 mr-1" />
+                    Bật thông báo
+                  </button>
+                )}
+              </div>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"

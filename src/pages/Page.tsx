@@ -9,15 +9,15 @@ import useDialog from "../hooks/useDialog";
 import { toast } from "react-toastify";
 import Breadcrumb from "../components/Breadcrumb";
 import {
-  CircleCheckBigIcon,
-  ClockIcon,
+  // CircleCheckBigIcon,
+  // ClockIcon,
   EarthIcon,
   MessageSquareIcon,
   UsersIcon,
   ShieldCheckIcon,
   EyeIcon,
   TrashIcon,
-  PowerIcon,
+  //PowerIcon,
   CheckSquareIcon,
   SquareIcon,
 } from "lucide-react";
@@ -157,32 +157,6 @@ const Page = () => {
       ),
     },
     {
-      label: "Trạng thái",
-      accessor: "status",
-      align: "center",
-      render: (item: any) => (
-        <span
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded-md ${
-            item.status === 1
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-green-100 text-green-800"
-          }`}
-        >
-          {item.status === 1 ? (
-            <>
-              <ClockIcon size={16} />
-              Chưa kích hoạt
-            </>
-          ) : (
-            <>
-              <CircleCheckBigIcon size={16} />
-              Đã kích hoạt
-            </>
-          )}
-        </span>
-      ),
-    },
-    {
       label: "Duyệt tự động",
       accessor: "isAutoModerationEnabled",
       align: "center",
@@ -224,19 +198,6 @@ const Page = () => {
             title="Xem chi tiết"
           >
             <EyeIcon size={18} />
-          </button>
-          <button
-            onClick={() =>
-              handleChangeStatus(item._id, item.status === 1 ? 2 : 1)
-            }
-            className={`p-2 rounded-lg transition-colors ${
-              item.status === 1
-                ? "text-green-600 hover:bg-green-50"
-                : "text-yellow-600 hover:bg-yellow-50"
-            }`}
-            title={item.status === 1 ? "Kích hoạt trang" : "Vô hiệu hóa trang"}
-          >
-            <PowerIcon size={18} />
           </button>
           <button
             onClick={() => {
@@ -307,24 +268,24 @@ const Page = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleChangeStatus = async (pageId: string, newStatus: number) => {
-    try {
-      const res = await put(`/v1/page/change-state`, {
-        id: pageId,
-        status: newStatus,
-      });
-      if (res.result) {
-        toast.success(
-          newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
-        );
-        await handleRefreshData();
-      } else {
-        toast.error(res.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi thay đổi trạng thái");
-    }
-  };
+  // const handleChangeStatus = async (pageId: string, newStatus: number) => {
+  //   try {
+  //     const res = await put(`/v1/page/change-state`, {
+  //       id: pageId,
+  //       status: newStatus,
+  //     });
+  //     if (res.result) {
+  //       toast.success(
+  //         newStatus === 2 ? "Đã kích hoạt trang" : "Đã vô hiệu hóa trang"
+  //       );
+  //       await handleRefreshData();
+  //     } else {
+  //       toast.error(res.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Có lỗi xảy ra khi thay đổi trạng thái");
+  //   }
+  // };
 
   const handleDelete = async () => {
     hideDialog();

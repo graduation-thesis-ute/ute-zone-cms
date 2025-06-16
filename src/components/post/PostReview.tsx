@@ -152,21 +152,43 @@ const PostReview = ({ isVisible, setVisible, postId, onButtonClick }: any) => {
   }, [postId, isVisible]);
 
   const handleUpdate = async (action: string) => {
+    console.log("=== Bắt đầu xử lý hành động ===");
+    console.log("Action:", action);
+    console.log("Post ID:", postId);
+    console.log("Post status hiện tại:", post?.status);
+    console.log("Reason:", reason);
+
     if (action === "reject" && !reason.trim()) {
       toast.error("Vui lòng nhập lý do từ chối");
       return;
     }
 
     const actionMap: any = {
-      accept: { status: 2, message: "Xét duyệt bài đăng thành công" },
-      reject: { status: 3, message: "Từ chối bài đăng thành công" },
-      delete: { message: "Xóa bài đăng thành công" },
+      accept: { 
+        status: 2, 
+        message: "Xét duyệt bài đăng thành công",
+        title: "Xét duyệt bài đăng",
+        confirmMessage: "Bạn có chắc muốn chấp nhận bài đăng này?"
+      },
+      reject: { 
+        status: 3, 
+        message: "Từ chối bài đăng thành công",
+        title: "Từ chối bài đăng",
+        confirmMessage: "Bạn có chắc muốn từ chối bài đăng này?"
+      },
+      delete: { 
+        message: "Xóa bài đăng thành công",
+        title: "Xóa bài đăng",
+        confirmMessage: "Bạn có chắc muốn xóa bài đăng này?"
+      }
     };
+
+    console.log("Action map config:", actionMap[action]);
 
     if (action === "delete") {
       showDialog({
-        title: "Xóa bài đăng",
-        message: "Bạn có chắc muốn xóa bài đăng này?",
+        title: actionMap.delete.title,
+        message: actionMap.delete.confirmMessage,
         confirmText: "Xóa",
         color: "red",
         onConfirm: async () => {
@@ -176,33 +198,55 @@ const PostReview = ({ isVisible, setVisible, postId, onButtonClick }: any) => {
             toast.success(actionMap.delete.message);
             setVisible(false);
             onButtonClick();
+          } else {
+            toast.error(res?.message || "Có lỗi xảy ra");
           }
         },
         onCancel: hideDialog,
       });
     } else {
       showDialog({
-        title: action == "accept" ? "Xét duyệt bài đăng" : "Từ chối bài đăng",
-        message:
-          action == "accept"
-            ? "Bạn có chắc muốn chấp nhận bài đăng này?"
-            : "Bạn có chắc muốn từ chối bài đăng này?",
-        confirmText: action == "accept" ? "Chấp nhận" : "Từ chối",
-        color: action == "accept" ? "green" : "red",
+        title: actionMap[action].title,
+        message: actionMap[action].confirmMessage,
+        confirmText: action === "accept" ? "Chấp nhận" : "Từ chối",
+        color: action === "accept" ? "green" : "red",
         onConfirm: async () => {
-          const res = await put(`/v1/post/change-state`, {
-            id: postId,
-            status: actionMap[action].status,
-            reason: action === "reject" ? reason : "",
-          });
-          hideDialog();
-          if (res?.result) {
-            toast.success(actionMap[action].message);
-            setVisible(false);
-            onButtonClick();
+          try {
+            console.log("=== Gửi request thay đổi trạng thái ===");
+            const requestData = {
+              id: postId,
+              status: actionMap[action].status,
+              reason: action === "reject" ? reason : null
+            };
+            console.log("Request data:", requestData);
+
+            const res = await put(`/v1/post/change-state`, requestData);
+            console.log("Response từ server:", res);
+            
+            if (res?.result) {
+              console.log("Thành công - Cập nhật trạng thái");
+              toast.success(actionMap[action].message);
+              setVisible(false);
+              onButtonClick();
+            } else {
+              console.log("Lỗi từ server:", res?.message);
+              toast.error(res?.message || "Có lỗi xảy ra");
+            }
+          } catch (error: any) {
+            console.error('=== Chi tiết lỗi ===');
+            console.error('Error object:', error);
+            console.error('Error response:', error?.response);
+            console.error('Error message:', error?.message);
+            console.error('Server error message:', error?.response?.data?.message);
+            
+            toast.error(error?.response?.data?.message || "Có lỗi xảy ra khi cập nhật trạng thái bài đăng");
           }
+          hideDialog();
         },
-        onCancel: hideDialog,
+        onCancel: () => {
+          console.log("Hủy thao tác");
+          hideDialog();
+        },
       });
     }
   };
@@ -270,7 +314,92 @@ const PostReview = ({ isVisible, setVisible, postId, onButtonClick }: any) => {
                 </div>
               </div>
 
-              {post.status === 1 && mode === "reject" && (
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  onClick={() => setVisible(false)}
+                >
+                  <XIcon className="h-5 w-5" />
+                </button>
+                
+                {/* Delete button always visible */}
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center"
+                  onClick={() => handleUpdate("delete")}
+                >
+                  <TrashIcon className="h-5 w-5 mr-2" />
+                  Xóa bài đăng
+                </button>
+
+                {/* Show accept/reject buttons based on current status */}
+                {post.status === 1 && (
+                  <>
+                    <button
+                      className={`px-4 py-2 rounded-lg flex items-center ${
+                        mode === "reject"
+                          ? "bg-red-600 text-white hover:bg-red-700"
+                          : "text-red-600 bg-white border border-red-600 hover:bg-red-50"
+                      }`}
+                      onClick={() => {
+                        if (mode === "reject") {
+                          handleUpdate("reject");
+                        } else {
+                          setMode("reject");
+                        }
+                      }}
+                    >
+                      <XCircleIcon className="h-5 w-5 mr-2" />
+                      Từ chối
+                    </button>
+                    <button
+                      className={`px-4 py-2 rounded-lg flex items-center ${
+                        mode === "accept"
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "text-green-600 bg-white border border-green-600 hover:bg-green-50"
+                      }`}
+                      onClick={() => {
+                        if (mode === "accept") {
+                          handleUpdate("accept");
+                        } else {
+                          setMode("accept");
+                        }
+                      }}
+                    >
+                      <CheckCircleIcon className="h-5 w-5 mr-2" />
+                      Chấp nhận
+                    </button>
+                  </>
+                )}
+
+                {/* Show accept button if post is rejected */}
+                {post.status === 3 && (
+                  <button
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"
+                    onClick={() => handleUpdate("accept")}
+                  >
+                    <CheckCircleIcon className="h-5 w-5 mr-2" />
+                    Duyệt lại
+                  </button>
+                )}
+
+                {/* Show reject button if post is accepted */}
+                {post.status === 2 && (
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center"
+                    onClick={() => {
+                      setMode("reject");
+                      handleUpdate("reject");
+                    }}
+                  >
+                    <XCircleIcon className="h-5 w-5 mr-2" />
+                    Từ chối
+                  </button>
+                )}
+              </div>
+
+              {/* Reason input for rejection */}
+              {mode === "reject" && (
                 <div className="mt-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Lý do từ chối
@@ -282,69 +411,6 @@ const PostReview = ({ isVisible, setVisible, postId, onButtonClick }: any) => {
                     onChange={(e) => setReason(e.target.value)}
                     placeholder="Nhập lý do từ chối bài đăng..."
                   />
-                </div>
-              )}
-            </div>
-
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-              {post.status === 1 ? (
-                <div className="flex justify-end space-x-3">
-                  <button
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    onClick={() => setVisible(false)}
-                  >
-                    <XIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded-lg flex items-center ${
-                      mode === "reject"
-                        ? "bg-red-600 text-white hover:bg-red-700"
-                        : "text-red-600 bg-white border border-red-600 hover:bg-red-50"
-                    }`}
-                    onClick={() => {
-                      if (mode === "reject") {
-                        handleUpdate("reject");
-                      } else {
-                        setMode("reject");
-                      }
-                    }}
-                  >
-                    <XCircleIcon className="h-5 w-5 mr-2" />
-                    Từ chối
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded-lg flex items-center ${
-                      mode === "accept"
-                        ? "bg-green-600 text-white hover:bg-green-700"
-                        : "text-green-600 bg-white border border-green-600 hover:bg-green-50"
-                    }`}
-                    onClick={() => {
-                      if (mode === "accept") {
-                        handleUpdate("accept");
-                      } else {
-                        setMode("accept");
-                      }
-                    }}
-                  >
-                    <CheckCircleIcon className="h-5 w-5 mr-2" />
-                    Chấp nhận
-                  </button>
-                </div>
-              ) : (
-                <div className="flex justify-end space-x-3">
-                  <button
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    onClick={() => setVisible(false)}
-                  >
-                    <XIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center"
-                    onClick={() => handleUpdate("delete")}
-                  >
-                    <TrashIcon className="h-5 w-5 mr-2" />
-                    Xóa bài đăng
-                  </button>
                 </div>
               )}
             </div>
