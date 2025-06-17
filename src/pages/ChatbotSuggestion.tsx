@@ -179,7 +179,7 @@ const ChatbotSuggestion = () => {
   return (
     <>
       <Sidebar
-        activeItem="chatbot-suggestion"
+        activeItem="suggestion"
         renderContent={
           <>
             <Header
