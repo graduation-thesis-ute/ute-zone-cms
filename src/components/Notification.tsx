@@ -24,10 +24,11 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
   const [activeTab, setActiveTab] = useState(1);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const { get, put, del, loading } = useFetch();
-  const { permission, requestPermission, showNotification, isSupported } = useBrowserNotification();
+  const { permission, requestPermission, showNotification, isSupported } =
+    useBrowserNotification();
   const previousNotificationsRef = useRef<NotificationItem[]>([]);
   const originalTitleRef = useRef(document.title);
-  const titleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const titleTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     fetchNotifications();
@@ -51,7 +52,7 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
 
     // Find new notifications
     // const newNotifications = notifications.filter(
-    //   (newNotif) => 
+    //   (newNotif) =>
     //     !previousNotificationsRef.current.some(
     //       (oldNotif) => oldNotif._id === newNotif._id
     //     )
@@ -60,17 +61,23 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
     // Get the latest unread notification
     const latestUnread = notifications
       .filter((n) => n.status === 1)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )[0];
 
     // Update browser tab title
     if (latestUnread) {
       // Truncate message if too long (max 30 characters)
-      const truncatedMessage = latestUnread.message.length > 30 
-        ? latestUnread.message.substring(0, 30) + '...' 
-        : latestUnread.message;
-      
-      document.title = `(${notifications.filter((n) => n.status === 1).length}) ${truncatedMessage} - ${originalTitleRef.current}`;
-      
+      const truncatedMessage =
+        latestUnread.message.length > 30
+          ? latestUnread.message.substring(0, 30) + "..."
+          : latestUnread.message;
+
+      document.title = `(${
+        notifications.filter((n) => n.status === 1).length
+      }) ${truncatedMessage} - ${originalTitleRef.current}`;
+
       // Set timeout to restore original title after 3 seconds
       titleTimeoutRef.current = setTimeout(() => {
         document.title = originalTitleRef.current;
@@ -85,20 +92,24 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
 
   useEffect(() => {
     // Check for new notifications and show browser notification
-    if (notifications.length > 0 && previousNotificationsRef.current.length > 0) {
+    if (
+      notifications.length > 0 &&
+      previousNotificationsRef.current.length > 0
+    ) {
       const newNotifications = notifications.filter(
-        (newNotif) => 
+        (newNotif) =>
           !previousNotificationsRef.current.some(
             (oldNotif) => oldNotif._id === newNotif._id
           )
       );
 
       newNotifications.forEach((notification) => {
-        if (notification.status === 1) { // Only show for unread notifications
+        if (notification.status === 1) {
+          // Only show for unread notifications
           showNotification({
-            title: 'UTEZone - Thông báo mới',
+            title: "UTEZone - Thông báo mới",
             body: notification.message,
-            tag: 'utezone-notification',
+            tag: "utezone-notification",
             requireInteraction: false,
           });
         }
@@ -169,7 +180,7 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center space-x-2">
                 <h2 className="text-lg font-semibold">Thông báo</h2>
-                {isSupported && permission !== 'granted' && (
+                {isSupported && permission !== "granted" && (
                   <button
                     onClick={requestPermission}
                     className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors"
