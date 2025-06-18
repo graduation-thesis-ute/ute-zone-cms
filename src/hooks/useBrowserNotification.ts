@@ -68,9 +68,9 @@ export const useBrowserNotification = () => {
         requireInteraction: options.requireInteraction || false,
       });
 
-      // Auto close after 5 seconds if not requiring interaction
+      // Auto close after 3 seconds if not requiring interaction
       if (!options.requireInteraction) {
-        setTimeout(() => notification.close(), 5000);
+        setTimeout(() => notification.close(), 3000);
       }
 
       // Handle click event
