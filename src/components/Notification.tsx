@@ -27,6 +27,7 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
   const { permission, requestPermission, showNotification, isSupported } = useBrowserNotification();
   const previousNotificationsRef = useRef<NotificationItem[]>([]);
   const originalTitleRef = useRef(document.title);
+  const titleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchNotifications();
@@ -36,17 +37,25 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
       clearInterval(interval);
       // Restore original title when component unmounts
       document.title = originalTitleRef.current;
+      if (titleTimeoutRef.current) {
+        clearTimeout(titleTimeoutRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
+    // Clear any existing timeout
+    if (titleTimeoutRef.current) {
+      clearTimeout(titleTimeoutRef.current);
+    }
+
     // Find new notifications
-    const newNotifications = notifications.filter(
-      (newNotif) => 
-        !previousNotificationsRef.current.some(
-          (oldNotif) => oldNotif._id === newNotif._id
-        )
-    );
+    // const newNotifications = notifications.filter(
+    //   (newNotif) => 
+    //     !previousNotificationsRef.current.some(
+    //       (oldNotif) => oldNotif._id === newNotif._id
+    //     )
+    // );
 
     // Get the latest unread notification
     const latestUnread = notifications
@@ -61,6 +70,11 @@ const Notification = ({ isOpen, setIsOpen }: any) => {
         : latestUnread.message;
       
       document.title = `(${notifications.filter((n) => n.status === 1).length}) ${truncatedMessage} - ${originalTitleRef.current}`;
+      
+      // Set timeout to restore original title after 3 seconds
+      titleTimeoutRef.current = setTimeout(() => {
+        document.title = originalTitleRef.current;
+      }, 3000);
     } else {
       document.title = originalTitleRef.current;
     }
